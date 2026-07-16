@@ -15,22 +15,53 @@
 <section class="hero">
     <h2>Create Your Account</h2>
 
-    <form>
-        <input type="text" placeholder="Full Name" required><br><br>
+    <form onsubmit="return false;">
+        <input type="text" id="fullname" placeholder="Full Name" required><br><br>
 
-        <input type="email" placeholder="Email Address" required><br><br>
+        <input type="email" id="email" placeholder="Email Address" required><br><br>
 
-        <input type="tel" placeholder="WhatsApp Number" required><br><br>
+        <input type="tel" id="phone" placeholder="WhatsApp Number" required><br><br>
 
-        <input type="password" placeholder="Password" required><br><br>
+        <input type="password" id="password" placeholder="Password" required><br><br>
 
-        <button type="submit">Register</button>
+        <button type="button" onclick="registerUser()">Register</button>
     </form>
 
     <br>
 
     <p>Already have an account? <a href="login.html">Login here</a></p>
 </section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
+  authDomain: "global-hope-grant.firebaseapp.com",
+  projectId: "global-hope-grant",
+  storageBucket: "global-hope-grant.firebasestorage.app",
+  messagingSenderId: "253915548678",
+  appId: "1:253915548678:web:dff5dd9fcd0a9ab821c787"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.registerUser = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+        alert("Registration successful!");
+        window.location.href = "login.html";
+    })
+    .catch((error) => {
+        alert(error.message);
+    });
+}
+</script>
 
 </body>
 </html>
