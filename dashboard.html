@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Global Hope Grant</title>
 
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    text-align:center;
+}
+header{
+    background:#003c88;
+    color:white;
+    padding:20px;
+}
+.container{
+    margin:40px auto;
+    width:90%;
+    max-width:600px;
+}
+.card{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+button{
+    background:#003c88;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+button:hover{
+    background:#0056c7;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Global Hope Grant</h1>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Welcome!</h2>
+
+<p>You have successfully logged in to your Global Hope Grant account.</p>
+
+<p>From here you will be able to:</p>
+
+<ul style="text-align:left;">
+<li>Apply for a grant</li>
+<li>Check your application status</li>
+<li>Update your profile</li>
+<li>Contact support</li>
+</ul>
+
+<br>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
+  authDomain: "global-hope-grant.firebaseapp.com",
+  projectId: "global-hope-grant",
+  storageBucket: "global-hope-grant.firebasestorage.app",
+  messagingSenderId: "253915548678",
+  appId: "1:253915548678:web:dff5dd9fcd0a9ab821c787"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.logout = function () {
+    signOut(auth).then(() => {
+        alert("Logged out successfully.");
+        window.location.href = "login.html";
+    });
+}
+</script>
+
+</body>
+</html>
