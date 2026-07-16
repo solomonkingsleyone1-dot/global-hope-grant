@@ -38,6 +38,7 @@ button{
     border-radius:5px;
     cursor:pointer;
     font-size:16px;
+    margin:8px;
 }
 button:hover{
     background:#0056c7;
@@ -59,18 +60,17 @@ button:hover{
 
 <p>You have successfully logged in to your Global Hope Grant account.</p>
 
-<p>From here you will be able to:</p>
+<p>Choose an option below:</p>
 
-<ul style="text-align:left;">
-<li>Apply for a grant</li>
-<li>Check your application status</li>
-<li>Update your profile</li>
-<li>Contact support</li>
-</ul>
+<button onclick="window.location.href='apply.html'">
+Apply for Grant
+</button>
 
-<br>
+<br><br>
 
-<button onclick="logout()">Logout</button>
+<button onclick="logout()">
+Logout
+</button>
 
 </div>
 
@@ -93,11 +93,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 window.logout = function () {
-    signOut(auth).then(() => {
-        alert("Logged out successfully.");
+    signOut(auth)
+    .then(() => {
+        alert("Logged out successfully!");
         window.location.href = "login.html";
+    })
+    .catch((error) => {
+        alert(error.message);
     });
-}
+};
 </script>
 
 </body>
