@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Global Hope Grant</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Global Hope Grant</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-    <h1>Global Hope Grant</h1>
+<div class="container">
+<h1>Global Hope Grant</h1>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="register.html">Register</a>
+</nav>
+</div>
 </header>
 
 <section class="hero">
-    <h2>Create Your Account</h2>
+<div class="container">
 
-    <form onsubmit="return false;">
-        <input type="text" id="fullname" placeholder="Full Name" required><br><br>
+<h2>Login</h2>
+<p>Sign in to continue your grant application.</p>
 
-        <input type="email" id="email" placeholder="Email Address" required><br><br>
+<form onsubmit="return false;">
+<input type="email" id="loginEmail" placeholder="Email Address" required><br><br>
 
-        <input type="tel" id="phone" placeholder="WhatsApp Number" required><br><br>
+<input type="password" id="loginPassword" placeholder="Password" required><br><br>
 
-        <input type="password" id="password" placeholder="Password" required><br><br>
+<button type="button" onclick="loginUser()">Login</button>
+</form>
 
-        <button type="button" onclick="registerUser()">Register</button>
-    </form>
+<p style="margin-top:20px;">
+Don't have an account?
+<a href="register.html">Register</a>
+</p>
 
-    <br>
-
-    <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
 </section>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
@@ -48,18 +57,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.registerUser = function () {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+window.loginUser = function () {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-    createUserWithEmailAndPassword(auth, email, password)
-    .then(() => {
-        alert("Registration successful!");
-        window.location.href = "login.html";
-    })
-    .catch((error) => {
-        alert(error.message);
-    });
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            alert("Login successful!");
+            window.location.href = "dashboard.html";
+        })
+        .catch((error) => {
+            console.log(error.code);
+            console.log(error.message);
+
+            if (error.code === "auth/invalid-credential") {
+                alert("Incorrect email or password.");
+            } else if (error.code === "auth/user-not-found") {
+                alert("Account not found.");
+            } else if (error.code === "auth/wrong-password") {
+                alert("Wrong password.");
+            } else if (error.code === "auth/invalid-email") {
+                alert("Invalid email address.");
+            } else {
+                alert(error.code + "\n" + error.message);
+            }
+        });
 }
 </script>
 
