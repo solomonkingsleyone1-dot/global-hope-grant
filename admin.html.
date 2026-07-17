@@ -4,56 +4,71 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard | Global Hope Grant</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
 body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f4f4;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f4f4;
 }
 
 header{
-    background:#003c88;
-    color:#fff;
-    padding:20px;
-    text-align:center;
+background:#003c88;
+color:white;
+padding:20px;
+text-align:center;
 }
 
 .container{
-    width:95%;
-    max-width:1000px;
-    margin:30px auto;
+width:95%;
+max-width:1200px;
+margin:auto;
+padding:20px;
 }
 
 .card{
-    background:#fff;
-    border-radius:10px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,.15);
-}
-
-h2{
-    text-align:center;
-}
-
-p{
-    margin:8px 0;
+background:white;
+padding:20px;
+margin:20px 0;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.2);
 }
 
 button{
-    background:#003c88;
-    color:white;
-    border:none;
-    padding:10px 18px;
-    border-radius:5px;
-    cursor:pointer;
-    margin-top:15px;
+padding:10px 18px;
+margin:5px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-size:15px;
 }
 
-button:hover{
-    background:#0056c7;
+.approve{
+background:#28a745;
+color:white;
+}
+
+.reject{
+background:#dc3545;
+color:white;
+}
+
+.delete{
+background:#000;
+color:white;
+}
+
+.logout{
+background:#003c88;
+color:white;
+float:right;
+}
+
+.status{
+font-weight:bold;
+color:#003c88;
 }
 </style>
 
@@ -62,16 +77,23 @@ button:hover{
 <body>
 
 <header>
+
 <h1>Global Hope Grant</h1>
-<h3>Administrator Dashboard</h3>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+<h2>Administrator Dashboard</h2>
+
 </header>
 
 <div class="container">
 
-<h2>Submitted Grant Applications</h2>
+<h2>Grant Applications</h2>
 
 <div id="applications">
-Loading applications...
+Loading...
 </div>
 
 </div>
@@ -83,50 +105,96 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/fireba
 import {
 getFirestore,
 collection,
-getDocs
+onSnapshot,
+doc,
+updateDoc,
+deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+import {
+getAuth,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
+apiKey:"AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
 
-authDomain: "global-hope-grant.firebaseapp.com",
+authDomain:"global-hope-grant.firebaseapp.com",
 
-projectId: "global-hope-grant",
+projectId:"global-hope-grant",
 
-storageBucket: "global-hope-grant.firebasestorage.app",
+storageBucket:"global-hope-grant.firebasestorage.app",
 
-messagingSenderId: "253915548678",
+messagingSenderId:"253915548678",
 
-appId: "1:253915548678:web:dff5dd9fcd0a9ab821c787"
+appId:"1:253915548678:web:dff5dd9fcd0a9ab821c787"
 
 };
 
-const app = initializeApp(firebaseConfig);
+const app=initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db=getFirestore(app);
 
-const applicationsDiv = document.getElementById("applications");
+const auth=getAuth(app);
 
-applicationsDiv.innerHTML = "";
+const adminEmail="solomonkingsleyone1@gmail.com";
 
-async function loadApplications(){
+const container=document.getElementById("applications");
 
-const querySnapshot = await getDocs(collection(db,"applications"));
+onAuthStateChanged(auth,(user)=>{
 
-if(querySnapshot.empty){
+if(!user){
 
-applicationsDiv.innerHTML="<h3>No grant applications found.</h3>";
+window.location="login.html";
 
 return;
 
 }
 
-querySnapshot.forEach((doc)=>{
+if(user.email!==adminEmail){
 
-const data=doc.data();
+alert("Access denied.");
 
-applicationsDiv.innerHTML += `
+window.location="dashboard.html";
+
+return;
+
+}
+
+loadApplications();
+
+});
+
+async function logout(){
+
+await signOut(auth);
+
+window.location="login.html";
+
+}
+
+window.logout=logout;
+function loadApplications(){
+
+onSnapshot(collection(db,"applications"),(snapshot)=>{
+
+container.innerHTML="";
+
+if(snapshot.empty){
+
+container.innerHTML="<h3>No applications found.</h3>";
+
+return;
+
+}
+
+snapshot.forEach((application)=>{
+
+const data=application.data();
+
+container.innerHTML+=`
 
 <div class="card">
 
@@ -140,11 +208,23 @@ applicationsDiv.innerHTML += `
 
 <p><strong>Grant Type:</strong> ${data.grantType}</p>
 
-<p><strong>Amount Requested:</strong> $${data.amount}</p>
+<p><strong>Amount:</strong> $${data.amount}</p>
 
-<p><strong>Reason:</strong><br>${data.reason}</p>
+<p><strong>Reason:</strong> ${data.reason}</p>
 
-<p><strong>Date Submitted:</strong> ${data.date}</p>
+<p><strong>Status:</strong> <span class="status">${data.status || "Pending"}</span></p>
+
+<button class="approve" onclick="approveApplication('${application.id}')">
+Approve
+</button>
+
+<button class="reject" onclick="rejectApplication('${application.id}')">
+Reject
+</button>
+
+<button class="delete" onclick="deleteApplication('${application.id}')">
+Delete
+</button>
 
 </div>
 
@@ -152,9 +232,39 @@ applicationsDiv.innerHTML += `
 
 });
 
+});
+
 }
 
-loadApplications();
+window.approveApplication=async(id)=>{
+
+await updateDoc(doc(db,"applications",id),{
+
+status:"Approved"
+
+});
+
+};
+
+window.rejectApplication=async(id)=>{
+
+await updateDoc(doc(db,"applications",id),{
+
+status:"Rejected"
+
+});
+
+};
+
+window.deleteApplication=async(id)=>{
+
+if(confirm("Delete this application?")){
+
+await deleteDoc(doc(db,"applications",id));
+
+}
+
+};
 
 </script>
 
