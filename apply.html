@@ -1,51 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grant Application | Global Hope Grant</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grant Application | Global Hope Grant</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
-    <div class="container">
-        <h1>Global Hope Grant</h1>
+<div class="container">
+<h1>Global Hope Grant</h1>
 
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="register.html">Register</a>
-            <a href="login.html">Login</a>
-        </nav>
-    </div>
+<nav>
+<a href="index.html">Home</a>
+<a href="dashboard.html">Dashboard</a>
+</nav>
 </header>
 
 <section class="hero">
-    <div class="container">
+<div class="container">
 
-        <h2>Grant Application Form</h2>
-        <p>Please complete the form below.</p>
+<h2>Grant Application Form</h2>
 
-        <form id="applicationForm">
+<form id="applicationForm">
 
-            <input type="text" id="fullName" placeholder="Full Name" required>
+<input type="text" id="fullName" placeholder="Full Name" required><br><br>
 
-            <input type="email" id="email" placeholder="Email Address" required>
+<input type="email" id="email" placeholder="Email Address" required><br><br>
 
-            <input type="tel" id="phone" placeholder="WhatsApp Number" required>
+<input type="tel" id="phone" placeholder="WhatsApp Number" required><br><br>
 
-            <input type="text" id="country" placeholder="Country" required>
+<input type="text" id="country" placeholder="Country" required><br><br>
 
-            <textarea id="reason" placeholder="Why are you applying for this grant?" rows="5" required></textarea>
+<select id="grantType" required>
+<option value="">Select Grant Type</option>
+<option>Education Grant</option>
+<option>Business Grant</option>
+<option>Medical Grant</option>
+<option>Housing Grant</option>
+<option>Emergency Grant</option>
+</select><br><br>
 
-            <button type="submit">Submit Application</button>
+<input type="number" id="amount" placeholder="Amount Requested (USD)" required><br><br>
 
-        </form>
+<textarea id="reason" rows="5" placeholder="Reason for Applying" required></textarea><br><br>
 
-    </div>
+<button type="submit">Submit Application</button>
+
+</form>
+
+</div>
 </section>
 
-<script src="script.js"></script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
+authDomain: "global-hope-grant.firebaseapp.com",
+projectId: "global-hope-grant",
+storageBucket: "global-hope-grant.firebasestorage.app",
+messagingSenderId: "253915548678",
+appId: "1:253915548678:web:dff5dd9fcd0a9ab821c787"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+document.getElementById("applicationForm").addEventListener("submit", async (e) => {
+
+e.preventDefault();
+
+try{
+
+await addDoc(collection(db,"applications"),{
+
+fullname:document.getElementById("fullName").value,
+
+email:document.getElementById("email").value,
+
+phone:document.getElementById("phone").value,
+
+country:document.getElementById("country").value,
+
+grantType:document.getElementById("grantType").value,
+
+amount:document.getElementById("amount").value,
+
+reason:document.getElementById("reason").value,
+
+status:"Pending",
+
+date:serverTimestamp()
+
+});
+
+alert("Application submitted successfully!");
+
+document.getElementById("applicationForm").reset();
+
+window.location.href="dashboard.html";
+
+}catch(error){
+
+alert(error.code + "\n" + error.message);
+console.log(error);
+
+}
+
+});
+
+</script>
 
 </body>
 </html>
