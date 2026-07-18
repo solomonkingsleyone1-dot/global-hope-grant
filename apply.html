@@ -17,6 +17,7 @@
 <a href="index.html">Home</a>
 <a href="dashboard.html">Dashboard</a>
 </nav>
+</div>
 </header>
 
 <section class="hero">
@@ -28,7 +29,7 @@
 
 <input type="text" id="fullName" placeholder="Full Name" required><br><br>
 
-<input type="email" id="email" placeholder="Email Address" required><br><br>
+<input type="email" id="email" placeholder="Email Address" readonly required><br><br>
 
 <input type="tel" id="phone" placeholder="WhatsApp Number" required><br><br>
 
@@ -65,6 +66,11 @@ addDoc,
 serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+import {
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
 const firebaseConfig = {
 apiKey: "AIzaSyAi1Pbe-HDAsyEYnOyYzgb3HugKQt-4rv8",
 authDomain: "global-hope-grant.firebaseapp.com",
@@ -76,18 +82,36 @@ appId: "1:253915548678:web:dff5dd9fcd0a9ab821c787"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+
+if (!user) {
+alert("Please login first.");
+window.location.href = "login.html";
+return;
+}
+
+document.getElementById("email").value = user.email;
+
+});
 
 document.getElementById("applicationForm").addEventListener("submit", async (e) => {
 
 e.preventDefault();
 
-try{
+if (!auth.currentUser) {
+alert("Please login first.");
+return;
+}
+
+try {
 
 await addDoc(collection(db,"applications"),{
 
 fullname:document.getElementById("fullName").value,
 
-email:document.getElementById("email").value,
+email:auth.currentUser.email,
 
 phone:document.getElementById("phone").value,
 
@@ -95,7 +119,7 @@ country:document.getElementById("country").value,
 
 grantType:document.getElementById("grantType").value,
 
-amount:document.getElementById("amount").value,
+amount:Number(document.getElementById("amount").value),
 
 reason:document.getElementById("reason").value,
 
@@ -109,12 +133,12 @@ alert("Application submitted successfully!");
 
 document.getElementById("applicationForm").reset();
 
-window.location.href="dashboard.html";
+window.location.href="status.html";
 
-}catch(error){
+} catch(error) {
 
 alert(error.code + "\n" + error.message);
-console.log(error);
+console.error(error);
 
 }
 
