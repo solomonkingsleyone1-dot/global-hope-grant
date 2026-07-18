@@ -1,32 +1,42 @@
 // Global Hope Grant
 
-// Register Form
-const registerForm = document.getElementById("registerForm");
-
-if (registerForm) {
-    registerForm.addEventListener("submit", function(e) {
+// Smooth scrolling for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener("click", function(e) {
         e.preventDefault();
-        alert("Registration feature will be activated soon.");
+
+        const target = document.querySelector(this.getAttribute("href"));
+
+        if (target) {
+            target.scrollIntoView({
+                behavior: "smooth"
+            });
+        }
     });
-}
+});
 
-// Login Form
-const loginForm = document.getElementById("loginForm");
+// Fade-in animation
+const sections = document.querySelectorAll("section");
 
-if (loginForm) {
-    loginForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        alert("Login feature will be activated soon.");
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+        }
     });
-}
+}, {
+    threshold: 0.2
+});
 
-// Grant Application Form
-const applicationForm = document.getElementById("applicationForm");
+sections.forEach(section => {
+    section.style.opacity = "0";
+    section.style.transform = "translateY(40px)";
+    section.style.transition = "all .8s ease";
+    observer.observe(section);
+});
 
-if (applicationForm) {
-    applicationForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        alert("Your application has been submitted successfully.");
-        applicationForm.reset();
-    });
-}
+// Welcome message
+window.addEventListener("load", () => {
+    console.log("Global Hope Grant website loaded successfully.");
+});
